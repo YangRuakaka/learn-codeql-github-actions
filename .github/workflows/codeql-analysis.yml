@@ -1,0 +1,27 @@
+name: "CodeQL Analysis"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0' # 每周日午夜运行
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: 'javascript' # 根据项目语言配置
+        tools: 'codeql-cli/3.23.0' # 指定 CodeQL CLI 版本
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
