@@ -3,7 +3,7 @@ import java.io.*;
 public class UnsafeDeserialization {
     public static void main(String[] args) {
         try {
-            // 从用户输入中读取序列化数据
+            // 模拟从用户输入中读取序列化数据
             byte[] serializedData = getUserInput();
 
             // 不安全的反序列化操作
