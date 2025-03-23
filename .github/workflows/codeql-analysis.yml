@@ -11,6 +11,9 @@ jobs:
     name: Analyze with CodeQL
     runs-on: ubuntu-latest
 
+    # 仅在主仓库运行
+    if: github.repository == 'YangRuakaka/learn-codeql-github-actions'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -19,7 +22,7 @@ jobs:
         uses: github/codeql-action/init@v2
         with:
           languages: 'java'
-          queries: security-extended  # 使用扩展的安全查询集
+          queries: security-extended
 
       - name: Build the project
         run: |
