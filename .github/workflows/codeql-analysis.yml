@@ -23,7 +23,7 @@ jobs:
 
       - name: Build the project
         run: |
-          javac UnsafeDeserialization.java InsecureNetworkCommunication.java
+          javac DeserializationExample.java InsecureNetworkExample.java
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
