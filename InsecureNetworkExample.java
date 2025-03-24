@@ -5,7 +5,6 @@ import java.net.URL;
 public class InsecureNetworkExample {
     public static void main(String[] args) {
         try {
-            // 不安全的 HTTP 通信
             URL url = new URL("http://example.com"); // 风险点：未使用 HTTPS
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
             String line;
@@ -14,7 +13,6 @@ public class InsecureNetworkExample {
             }
             reader.close();
 
-            // 证书验证绕过
             trustAllCertificates(); // 风险点：禁用证书验证
             HttpsURLConnection httpsConnection = (HttpsURLConnection) new URL("https://example.com").openConnection();
             httpsConnection.setRequestMethod("GET");
