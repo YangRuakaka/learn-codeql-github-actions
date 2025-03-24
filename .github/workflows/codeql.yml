@@ -22,8 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - language: actions
-            build-mode: none
           - language: java-kotlin
             build-mode: none
 
@@ -35,17 +33,8 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+          queries: +.github/codeql/queries/UnsafeObjectInputStreamReadObject.ql, +.github/codeql/queries/UnsafeFastjsonParseObject.ql
           build-mode: ${{ matrix.build-mode }}
-
-      - if: matrix.build-mode == 'manual'
-        shell: bash
-        run: |
-          echo 'If you are using a "manual" build mode for one or more of the' \
-            'languages you are analyzing, replace this with the commands to build' \
-            'your code, for example:'
-          echo '  make bootstrap'
-          echo '  make release'
-          exit 1
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
