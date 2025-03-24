@@ -33,7 +33,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          queries: +.github/codeql/queries/UnsafeObjectInputStreamReadObject.ql, +.github/codeql/queries/UnsafeFastjsonParseObject.ql
+          queries: +codeql/java/ql/src/UnsafeObjectInputStreamReadObject.ql, +codeql/java/ql/src/UnsafeFastjsonParseObject.ql
           build-mode: ${{ matrix.build-mode }}
 
       - name: Perform CodeQL Analysis
