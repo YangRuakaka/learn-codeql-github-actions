@@ -1,59 +1,47 @@
 import javax.net.ssl.*;
 import java.io.*;
-import java.net.*;
+import java.net.URL;
 
-public class InsecureNetworkCommunication {
+public class InsecureNetworkExample {
     public static void main(String[] args) {
         try {
             // 不安全的 HTTP 通信
-            URL url = new URL("http://example.com"); // 风险点：使用 HTTP 而非 HTTPS
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-
-            // 读取响应
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+            URL url = new URL("http://example.com"); // 风险点：未使用 HTTPS
+            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
             }
-            in.close();
+            reader.close();
 
-            System.out.println("Response: " + response.toString());
-
-            // 不安全的证书验证
-            trustAllCertificates(); // 风险点：绕过证书验证
-            URL httpsUrl = new URL("https://example.com");
-            HttpsURLConnection httpsConnection = (HttpsURLConnection) httpsUrl.openConnection();
+            // 证书验证绕过
+            trustAllCertificates(); // 风险点：禁用证书验证
+            HttpsURLConnection httpsConnection = (HttpsURLConnection) new URL("https://example.com").openConnection();
             httpsConnection.setRequestMethod("GET");
-            System.out.println("HTTPS Response Code: " + httpsConnection.getResponseCode());
-
+            BufferedReader httpsReader = new BufferedReader(new InputStreamReader(httpsConnection.getInputStream()));
+            while ((line = httpsReader.readLine()) != null) {
+                System.out.println(line);
+            }
+            httpsReader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // 绕过证书验证
-    private static void trustAllCertificates() {
-        try {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-                    public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
-                    public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+    // 禁用证书验证
+    private static void trustAllCertificates() throws Exception {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
                 }
-            };
-
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-            // 忽略主机名验证
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+            }
+        };
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
     }
 }
