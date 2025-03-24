@@ -1,23 +1,29 @@
 import java.io.*;
-import com.alibaba.fastjson.JSON;
+import java.util.HashMap;
+import java.util.Map;
 
-public class UnsafeDeserialization {
+public class DeserializationVulnerable {
     public static void main(String[] args) {
         try {
-            // 从用户输入中读取数据
-            byte[] userInput = new byte[1024];
-            System.in.read(userInput);
+            // 创建一个恶意对象
+            Map<String, String> map = new HashMap<>();
+            map.put("key", "value");
 
-            // 不安全的反序列化操作 1: 使用 ObjectInputStream
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(userInput);
-            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-            Object obj1 = objectInputStream.readObject(); // 风险点：可能触发 RCE
-            System.out.println("Deserialized object 1: " + obj1);
+            // 将恶意对象序列化到文件
+            FileOutputStream fos = new FileOutputStream("vulnerable.ser");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(map);
+            oos.close();
+            fos.close();
 
-            // 不安全的反序列化操作 2: 使用 fastjson
-            String jsonInput = new String(userInput).trim(); // 将字节数组转换为字符串
-            Object obj2 = JSON.parseObject(jsonInput); // 风险点：可能触发 RCE 或数据篡改
-            System.out.println("Deserialized object 2: " + obj2);
+            // 从文件中反序列化对象
+            FileInputStream fis = new FileInputStream("vulnerable.ser");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            Object obj = ois.readObject(); // 漏洞点：直接反序列化外部输入对象
+            ois.close();
+            fis.close();
+
+            System.out.println("反序列化成功：" + obj);
         } catch (Exception e) {
             e.printStackTrace();
         }
