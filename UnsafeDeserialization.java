@@ -3,29 +3,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DeserializationVulnerable {
-    public static void main(String[] args) {
+      public static void main(String[] args) {
         try {
-            // 创建一个恶意对象
-            Map<String, String> map = new HashMap<>();
-            map.put("key", "value");
+            // 模拟从不可信来源获取数据
+            byte[] maliciousInput = getMaliciousInput();
 
-            // 将恶意对象序列化到文件
-            FileOutputStream fos = new FileOutputStream("vulnerable.ser");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(map);
-            oos.close();
-            fos.close();
-
-            // 从文件中反序列化对象
-            FileInputStream fis = new FileInputStream("vulnerable.ser");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            Object obj = ois.readObject(); // 漏洞点：直接反序列化外部输入对象
+            // 将恶意输入数据反序列化
+            ByteArrayInputStream bais = new ByteArrayInputStream(maliciousInput);
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            Object obj = ois.readObject(); // 漏洞点：直接反序列化不可信输入
             ois.close();
-            fis.close();
 
             System.out.println("反序列化成功：" + obj);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // 模拟获取恶意输入数据的方法
+    private static byte[] getMaliciousInput() {
+        // 这里可以返回恶意构造的字节数组
+        // 例如，从网络请求、用户输入等获取
+        return new byte[]{};
     }
 }
